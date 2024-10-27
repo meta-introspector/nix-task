@@ -2,7 +2,7 @@ import { Command } from 'commander'
 import chalk from 'chalk'
 import fs from 'fs-extra'
 import path from 'path'
-import { execa } from 'execa'
+import { execa, ExecaChildProcess } from 'execa'
 import { Task } from '../interfaces'
 import _ from 'lodash'
 import { getLazyTask, nixGetTasks, preBuild } from '../common'
@@ -12,6 +12,7 @@ import {
   setupRunEnvironmentGlobal,
 } from '../setupRunEnvironment'
 import * as tmp from 'tmp-promise'
+import treeKill from 'tree-kill'
 
 export default async function shell(
   taskPath: string,
@@ -101,7 +102,7 @@ set +e
 
     const outputRef = { current: null }
 
-    createCommandInterface(proc, { outputRef })
+    createCommandInterface(proc, { task, outputRef })
 
     await proc
   } catch (ex) {
@@ -110,5 +111,6 @@ set +e
     }
   } finally {
     await Promise.all([rcTmp.cleanup(), tmpDir.cleanup()])
+    process.exit(0)
   }
 }

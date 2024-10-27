@@ -13,6 +13,7 @@
     "esbuild": "^0.15.12",
     "esbuild-register": "^3.3.3",
     "execa": "^6.1.0",
+    "find-up": "^7.0.0",
     "fs-extra": "^10.1.0",
     "immer": "^9.0.15",
     "lodash": "^4.17.21",

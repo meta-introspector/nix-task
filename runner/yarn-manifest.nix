@@ -819,6 +819,23 @@ let
         "strip-final-newline" = packages."strip-final-newline@npm:3.0.0";
       };
     };
+    "find-up@npm:7.0.0" = {
+      name = "find-up";
+      reference = "npm:7.0.0";
+      linkType = "HARD";
+      outputName = "find-up-7.0.0-2283627385";
+      outputHash = "7e6b08fbc05a10677e25e74bb0a020054a86b31d1806c5e6a9e32e75472bbf177210bc16e5f97453be8bda7ae2e3d97669dbb2901f8c30b39ce53929cbea6746";
+      flatName = "find-up";
+      languageName = "node";
+      scope = null;
+      descriptorRange = "npm:^7.0.0";
+      checksum = "10/7e6b08fbc05a10677e25e74bb0a020054a86b31d1806c5e6a9e32e75472bbf177210bc16e5f97453be8bda7ae2e3d97669dbb2901f8c30b39ce53929cbea6746";
+      dependencies = {
+        "locate-path" = packages."locate-path@npm:7.2.0";
+        "path-exists" = packages."path-exists@npm:5.0.0";
+        "unicorn-magic" = packages."unicorn-magic@npm:0.1.0";
+      };
+    };
     "fs-extra@npm:10.1.0" = {
       name = "fs-extra";
       reference = "npm:10.1.0";
@@ -1060,6 +1077,21 @@ let
       descriptorRange = "npm:^1.1.6";
       checksum = "10/0c37f9f7fa212b38912b7145e1cd16a5f3cd34d782441c3e6ca653485d326f58b3caccda66efce1c5812bde4961bbde3374fae4b0d11bf1226152337f3894aa5";
     };
+    "locate-path@npm:7.2.0" = {
+      name = "locate-path";
+      reference = "npm:7.2.0";
+      linkType = "HARD";
+      outputName = "locate-path-7.2.0-0e1169e19b";
+      outputHash = "1c6d269d4efec555937081be964e8a9b4a136319c79ca1d45ac6382212a8466113c75bd89e44521ca8ecd1c47fb08523b56eee5c0712bc7d14fec5f729deeb42";
+      flatName = "locate-path";
+      languageName = "node";
+      scope = null;
+      descriptorRange = "npm:^7.2.0";
+      checksum = "10/1c6d269d4efec555937081be964e8a9b4a136319c79ca1d45ac6382212a8466113c75bd89e44521ca8ecd1c47fb08523b56eee5c0712bc7d14fec5f729deeb42";
+      dependencies = {
+        "p-locate" = packages."p-locate@npm:6.0.0";
+      };
+    };
     "lodash@npm:4.17.21" = {
       name = "lodash";
       reference = "npm:4.17.21";
@@ -1136,6 +1168,7 @@ let
         "esbuild" = packages."esbuild@npm:0.15.12";
         "esbuild-register" = packages."esbuild-register@virtual:020782a0a23141e8bbfabf10ff1c4c76fe8c3642230a40210be4975c1719aabca4ef9c3b1fbcc26700434ec995b7abddcd5e8f8fff969f16778dee087bd1702f#npm:3.3.3";
         "execa" = packages."execa@npm:6.1.0";
+        "find-up" = packages."find-up@npm:7.0.0";
         "fs-extra" = packages."fs-extra@npm:10.1.0";
         "immer" = packages."immer@npm:9.0.16";
         "lodash" = packages."lodash@npm:4.17.21";
@@ -1190,6 +1223,36 @@ let
       checksum = "10/0846ce78e440841335d4e9182ef69d5762e9f38aa7499b19f42ea1c4cd40f0b4446094c455c713f9adac3f4ae86f613bb5e30c99e52652764d06a89f709b3788";
       dependencies = {
         "mimic-fn" = packages."mimic-fn@npm:4.0.0";
+      };
+    };
+    "p-limit@npm:4.0.0" = {
+      name = "p-limit";
+      reference = "npm:4.0.0";
+      linkType = "HARD";
+      outputName = "p-limit-4.0.0-5dccf29b67";
+      outputHash = "01d9d70695187788f984226e16c903475ec6a947ee7b21948d6f597bed788e3112cc7ec2e171c1d37125057a5f45f3da21d8653e04a3a793589e12e9e80e756b";
+      flatName = "p-limit";
+      languageName = "node";
+      scope = null;
+      descriptorRange = "npm:^4.0.0";
+      checksum = "10/01d9d70695187788f984226e16c903475ec6a947ee7b21948d6f597bed788e3112cc7ec2e171c1d37125057a5f45f3da21d8653e04a3a793589e12e9e80e756b";
+      dependencies = {
+        "yocto-queue" = packages."yocto-queue@npm:1.1.1";
+      };
+    };
+    "p-locate@npm:6.0.0" = {
+      name = "p-locate";
+      reference = "npm:6.0.0";
+      linkType = "HARD";
+      outputName = "p-locate-6.0.0-b6cfb720dc";
+      outputHash = "2bfe5234efa5e7a4e74b30a5479a193fdd9236f8f6b4d2f3f69e3d286d9a7d7ab0c118a2a50142efcf4e41625def635bd9332d6cbf9cc65d85eb0718c579ab38";
+      flatName = "p-locate";
+      languageName = "node";
+      scope = null;
+      descriptorRange = "npm:^6.0.0";
+      checksum = "10/2bfe5234efa5e7a4e74b30a5479a193fdd9236f8f6b4d2f3f69e3d286d9a7d7ab0c118a2a50142efcf4e41625def635bd9332d6cbf9cc65d85eb0718c579ab38";
+      dependencies = {
+        "p-limit" = packages."p-limit@npm:4.0.0";
       };
     };
     "p-queue@npm:7.3.4" = {
@@ -1252,6 +1315,18 @@ let
         "json-parse-even-better-errors" = packages."json-parse-even-better-errors@npm:2.3.1";
         "lines-and-columns" = packages."lines-and-columns@npm:1.2.4";
       };
+    };
+    "path-exists@npm:5.0.0" = {
+      name = "path-exists";
+      reference = "npm:5.0.0";
+      linkType = "HARD";
+      outputName = "path-exists-5.0.0-0bf403c56c";
+      outputHash = "8ca842868cab09423994596eb2c5ec2a971c17d1a3cb36dbf060592c730c725cd524b9067d7d2a1e031fef9ba7bd2ac6dc5ec9fb92aa693265f7be3987045254";
+      flatName = "path-exists";
+      languageName = "node";
+      scope = null;
+      descriptorRange = "npm:^5.0.0";
+      checksum = "10/8ca842868cab09423994596eb2c5ec2a971c17d1a3cb36dbf060592c730c725cd524b9067d7d2a1e031fef9ba7bd2ac6dc5ec9fb92aa693265f7be3987045254";
     };
     "path-is-absolute@npm:1.0.1" = {
       name = "path-is-absolute";
@@ -1573,6 +1648,18 @@ let
         "tsserver" = "bin/tsserver";
       };
     };
+    "unicorn-magic@npm:0.1.0" = {
+      name = "unicorn-magic";
+      reference = "npm:0.1.0";
+      linkType = "HARD";
+      outputName = "unicorn-magic-0.1.0-12d4f6ff8b";
+      outputHash = "9b4d0e9809807823dc91d0920a4a4c0cff2de3ebc54ee87ac1ee9bc75eafd609b09d1f14495e0173aef26e01118706196b6ab06a75fe0841028b3983a8af313f";
+      flatName = "unicorn-magic";
+      languageName = "node";
+      scope = null;
+      descriptorRange = "npm:^0.1.0";
+      checksum = "10/9b4d0e9809807823dc91d0920a4a4c0cff2de3ebc54ee87ac1ee9bc75eafd609b09d1f14495e0173aef26e01118706196b6ab06a75fe0841028b3983a8af313f";
+    };
     "universalify@npm:2.0.0" = {
       name = "universalify";
       reference = "npm:2.0.0";
@@ -1626,6 +1713,18 @@ let
       scope = null;
       descriptorRange = "npm:^1.10.0";
       checksum = "10/e088b37b4d4885b70b50c9fa1b7e54bd2e27f5c87205f9deaffd1fb293ab263d9c964feadb9817a7b129a5bf30a06582cb08750f810568ecc14f3cdbabb79cb3";
+    };
+    "yocto-queue@npm:1.1.1" = {
+      name = "yocto-queue";
+      reference = "npm:1.1.1";
+      linkType = "HARD";
+      outputName = "yocto-queue-1.1.1-6bddf81a40";
+      outputHash = "f2e05b767ed3141e6372a80af9caa4715d60969227f38b1a4370d60bffe153c9c5b33a862905609afc9b375ec57cd40999810d20e5e10229a204e8bde7ef255c";
+      flatName = "yocto-queue";
+      languageName = "node";
+      scope = null;
+      descriptorRange = "npm:^1.0.0";
+      checksum = "10/f2e05b767ed3141e6372a80af9caa4715d60969227f38b1a4370d60bffe153c9c5b33a862905609afc9b375ec57cd40999810d20e5e10229a204e8bde7ef255c";
     };
   };
 in

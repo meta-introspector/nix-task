@@ -20,6 +20,10 @@ require('esbuild').build({
       process.env.PKG_PATH_COREUTILS,
     ),
     'process.env.PKG_PATH_JQ': JSON.stringify(process.env.PKG_PATH_JQ),
+    'process.env.PKG_PATH_CURL': JSON.stringify(process.env.PKG_PATH_CURL),
+    'process.env.PKG_PATH_NIX_LAZY': JSON.stringify(
+      process.env.PKG_PATH_NIX_LAZY,
+    ),
     'process.env.PKG_PATH_NODEJS': JSON.stringify(process.env.PKG_PATH_NODEJS),
     'process.env.PKG_PATH_UTIL_LINUX': JSON.stringify(
       process.env.PKG_PATH_UTIL_LINUX,

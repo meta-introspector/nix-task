@@ -3,6 +3,7 @@ import fs from 'fs-extra'
 import os from 'os'
 import readline from 'node:readline/promises'
 import chalk from 'chalk'
+import http from 'node:http'
 import * as tmp from 'tmp-promise'
 import { execa, ExecaChildProcess } from 'execa'
 import { CANCEL, eventChannel, runSaga, stdChannel } from 'redux-saga'
@@ -12,6 +13,8 @@ import { Task } from './interfaces'
 import { getFlakeUrlLocalRepoPath } from './common'
 import config from './config'
 import treeKill from 'tree-kill'
+import { text } from 'node:stream/consumers'
+import { nixEval } from './nixRepl'
 
 export async function setupRunEnvironmentGlobal() {
   const flakeRootDir = process.cwd() // todo look for flake.nix or something?
@@ -53,6 +56,30 @@ export async function setupRunEnvironment(
     await fs.ensureDir(artifactsDir)
   }
 
+  const server = http.createServer(async (req, res) => {
+    if (req.url === '/eval') {
+      try {
+        const requestBody = await text(req)
+        const evalResponse = await nixEval(
+          `(${requestBody}) ${task.flakeAttributePath}`,
+        )
+        res.writeHead(200)
+        res.end(
+          typeof evalResponse === 'object'
+            ? JSON.stringify(evalResponse)
+            : evalResponse + '\n',
+        )
+      } catch (ex) {
+        res.writeHead(500)
+        res.end(ex.message)
+      }
+    } else {
+      res.writeHead(404)
+      res.end()
+    }
+  })
+  server.listen(path.join(tmpDir.path, 'control.sock'))
+
   let workingDir =
     (function () {
       if (!task.dir) return null
@@ -81,6 +108,7 @@ export async function setupRunEnvironment(
     TEMP: tmpDir.path,
     TEMPDIR: tmpDir.path,
     NIX_TASK_FLAKE_PATH: task.ref,
+    TASK_CONTROL_SOCKET: path.join(tmpDir.path, 'control.sock'),
     out: artifactsDir,
   }
 
@@ -150,6 +178,9 @@ ${process.env.PKG_PATH_UTIL_LINUX}/bin/mount --bind ${dummyHomeDir} /root
   return `
 set -e
 
+# reset some variables that might come through from bashrc
+export SSH_AUTH_SOCK=""
+
 ${experimentalTaskUserNamespacesSetup}
 
 function taskRunShouldApply {
@@ -171,6 +202,15 @@ function taskGetDeps {
 }
 
 export -f taskGetDeps
+
+function taskEval {
+  ${process.env.PKG_PATH_CURL}/bin/curl -s --unix-socket $TASK_CONTROL_SOCKET \
+    -X POST -H "Content-Type: text/plain" \
+    --data "$*" \
+    http:/ctrl/eval
+}
+
+export -f taskEval
 
 function taskRunInBackground {
   allEnv="$(${
@@ -206,7 +246,7 @@ export PATH="$__taskPath"
 
 export function createCommandInterface(
   proc: ExecaChildProcess,
-  args: { outputRef: { current: null } },
+  args: { task: Task; outputRef: { current: null } },
 ) {
   const exitChannel = stdChannel()
   proc.on('exit', () => exitChannel.put({ type: 'exit' }))

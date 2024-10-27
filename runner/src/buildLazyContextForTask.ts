@@ -76,7 +76,7 @@ export default async function buildLazyContextForTask(
         { nixTaskStateDir },
       )
       const taskOutputResult = await callTaskGetOutput(
-        taskOutputDep.ref,
+        taskOutputDep,
         taskOutputDepsContext,
       )
       if (!depsContext[depKey]) depsContext[depKey] = {}

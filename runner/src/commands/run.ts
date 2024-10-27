@@ -76,6 +76,7 @@ export default async function run(
         2,
       ),
     )
+    process.exit(0)
     return
   }
 
@@ -355,13 +356,13 @@ function* runTask(
 
     const outputRef = { current: null }
 
-    createCommandInterface(proc, { outputRef })
+    createCommandInterface(proc, { task, outputRef })
 
     yield call(async () => await proc)
 
     if (task.hasGetOutput) {
       const outputResult = yield call(() =>
-        callTaskGetOutput(task.ref, outputRef.current),
+        callTaskGetOutput(task, outputRef.current),
       )
       if (outputResult != null) {
         outputRef.current = outputResult
