@@ -380,6 +380,7 @@ function* runTask(
 
     return true
   } catch (ex) {
+    // console.log('got exception', ex)
     return false
   } finally {
     if (backgroundLogTask?.cancel) backgroundLogTask.cancel()

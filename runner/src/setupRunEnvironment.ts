@@ -91,6 +91,14 @@ export async function setupRunEnvironment(
         const nixStoreSource = task.dir.split('/').slice(0, 4).join('/')
         const pathInNixStoreSource = path.relative(nixStoreSource, task.dir)
         return path.join(flakeLocalRepoPath, pathInNixStoreSource)
+      } else if (task.dir.startsWith('/nix/store/lazylaz')) {
+        if (task.resolvedOriginalFlakeUrl.startsWith('file://')) {
+          const parsed = new URL(task.resolvedOriginalFlakeUrl)
+          return parsed.pathname
+        } else {
+          const nixStoreSourceAfter = task.dir.split('/').slice(4).join('/')
+          return path.join(flakeRootDir, nixStoreSourceAfter)
+        }
       } else {
         // just return copied source in /nix/store (will be read only)
         return task.dir

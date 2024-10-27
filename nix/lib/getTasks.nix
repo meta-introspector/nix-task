@@ -117,7 +117,7 @@ let
     formatTasks (collectTasks {
       output = tasks;
       currentPath = "";
-      # opts.includeExtraAttributes = true; # include all attributes as getAllTasks shouldn't be serialised to JSON so functions don't matter
+      opts.includeExtraAttributes = true; # include all attributes as getAllTasks shouldn't be serialised to JSON so functions don't matter
     });
 in
 # __beginExports__

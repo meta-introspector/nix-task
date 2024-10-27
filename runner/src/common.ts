@@ -46,7 +46,9 @@ export async function nixGetTasksFromFlake(
   try {
     console.time('nix getTasksFromFlake')
 
-    await nixEval(`:l ${path.join(__dirname, '../../nix/lib/getTasks.nix')}`)
+    await nixEval(
+      `:l ${path.join(process.env.CONF_NIX_LIB_PATH!, './getTasks.nix')}`,
+    )
     await nixEval(`:lf ${flakeUrl}`)
 
     const tasks = await nixEval(

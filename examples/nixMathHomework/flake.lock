@@ -131,14 +131,18 @@
         "yarnpnp2nix": "yarnpnp2nix"
       },
       "locked": {
-        "lastModified": 0,
-        "narHash": "sha256-bbRT0oL2QXd4E4jt3/vBQP60T2U9WB3ZkaaB5nb6Di4=",
-        "path": "./../../",
-        "type": "path"
+        "lastModified": 1730028444,
+        "narHash": "sha256-ZBl9iJ+b29VXIeuVGn0t86VehxtpnjvFCnKVlcWBwrg=",
+        "owner": "madjam002",
+        "repo": "nix-task",
+        "rev": "67bc5befc4959ea8987964f50ffb668be97bc45c",
+        "type": "github"
       },
       "original": {
-        "path": "./../../",
-        "type": "path"
+        "owner": "madjam002",
+        "repo": "nix-task",
+        "rev": "67bc5befc4959ea8987964f50ffb668be97bc45c",
+        "type": "github"
       }
     },
     "nixpkgs": {
