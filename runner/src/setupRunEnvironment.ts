@@ -73,6 +73,29 @@ export async function setupRunEnvironment(
         res.writeHead(500)
         res.end(ex.message)
       }
+    } else if (req.url === '/evalRaw') {
+      try {
+        const requestBody = await text(req)
+        const evalResponse = await nixEval(requestBody)
+        res.writeHead(200)
+        res.end(
+          typeof evalResponse === 'object'
+            ? JSON.stringify(evalResponse)
+            : evalResponse + '\n',
+        )
+      } catch (ex) {
+        res.writeHead(500)
+        res.end(ex.message)
+      }
+    } else if (req.url === '/reloadFlake') {
+      try {
+        await nixEval(`:lf ${task.originalFlakeUrl}#`)
+        res.writeHead(200)
+        res.end()
+      } catch (ex) {
+        res.writeHead(500)
+        res.end(ex.message)
+      }
     } else {
       res.writeHead(404)
       res.end()
@@ -219,6 +242,24 @@ function taskEval {
 }
 
 export -f taskEval
+
+function taskReloadFlake {
+  ${process.env.PKG_PATH_CURL}/bin/curl -s --unix-socket $TASK_CONTROL_SOCKET \
+    -X POST -H "Content-Type: text/plain" \
+    --data "" \
+    http:/ctrl/reloadFlake
+}
+
+export -f taskReloadFlake
+
+function nixReplEval {
+  ${process.env.PKG_PATH_CURL}/bin/curl -s --unix-socket $TASK_CONTROL_SOCKET \
+    -X POST -H "Content-Type: text/plain" \
+    --data "$*" \
+    http:/ctrl/evalRaw
+}
+
+export -f nixReplEval
 
 function taskRunInBackground {
   allEnv="$(${
