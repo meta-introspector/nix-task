@@ -8,7 +8,11 @@ const commandQueue = channel(buffers.expanding(100) as any)
 export async function startNixRepl() {
   const task = runSaga({}, function* (): any {
     console.log('nix path: ', process.env.PKG_PATH_NIX_LAZY + '/bin/nix')
-    const repl = spawn(process.env.PKG_PATH_NIX_LAZY + '/bin/nix', ['repl'], {})
+    const repl = spawn(
+      process.env.PKG_PATH_NIX_LAZY + '/bin/nix',
+      ['repl', '--allow-unsafe-native-code-during-evaluation'], // --allow-unsafe-native-code-during-evaluation needed for builtins.exec which is useful in some tasks
+      {},
+    )
 
     // repl.stdout.on('data', data => console.log('stdout', data.toString()))
     repl.stderr.on('data', data => console.log('stderr', data.toString()))
