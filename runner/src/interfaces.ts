@@ -26,10 +26,12 @@ export interface Task {
   allDiscoveredDeps: Task[]
   dir: string
   path: string[]
+  tags?: string[] | null
   artifacts: string[]
   impureEnvPassthrough: string[]
   storeDependencies: string[]
   run: string
+  customFunctions: { [key: string]: string }
   shellHook?: string
   hasGetOutput?: boolean
 }

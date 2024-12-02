@@ -28,10 +28,31 @@ export default async function run(
   options: any,
   command: Command,
 ) {
-  const tasks = await nixGetTasks(taskPaths)
+  let tasks = await nixGetTasks(taskPaths, {
+    reverse: options.reverse === true,
+  })
+
+  if (options?.reverse) {
+    // reverse dependencies so it runs in reverse order
+    tasks = tasks.map(task => {
+      const dependsOnSelf = tasks.filter(_task =>
+        _task.allDiscoveredDeps.some(dep => dep.id === task.id),
+      )
+      return {
+        ...task,
+        allDiscoveredDeps: dependsOnSelf,
+      }
+    })
+  }
 
   if (options.debug) {
-    console.log('got tasks', tasks)
+    console.log(
+      'got tasks',
+      tasks.map(task => ({
+        ...task,
+        allDiscoveredDeps: task.allDiscoveredDeps.map(dep => dep.id),
+      })),
+    )
   }
 
   const isDryRunMode = options.dryRun ?? false
@@ -60,9 +81,22 @@ export default async function run(
     )
   }
 
+  const onlyTags =
+    options.only != null && typeof options.only === 'string'
+      ? options.only.split(',').map((tag: string) => tag.trim())
+      : null
+
+  const filteredTasks =
+    onlyTags != null
+      ? tasks.filter(
+          task =>
+            task.tags != null && task.tags?.some(tag => onlyTags.includes(tag)),
+        )
+      : tasks
+
   const sortedTasks = onlyTask
     ? [[onlyTask.id]]
-    : calculateBatchedRunOrder(tasks)
+    : calculateBatchedRunOrder(filteredTasks)
 
   if (options.graph) {
     console.log(
@@ -111,6 +145,19 @@ export default async function run(
             taskDoneStatus,
           )
         ) {
+          if (options.debug) {
+            console.log(
+              'tasks not finished for task',
+              task.flakeAttributePath,
+              taskIdsToRun,
+              task.allDiscoveredDeps.filter(
+                dep =>
+                  !(taskIdsToRun.includes(dep.id)
+                    ? taskDoneStatus[dep.id] === true
+                    : true),
+              ),
+            )
+          }
           await new Promise(resolve => {
             const handler = () => {
               if (
@@ -133,6 +180,7 @@ export default async function run(
           debug: options.debug,
           isDryRunMode,
           isRunningConcurrently,
+          customFunctionName: options.custom ?? undefined,
         }).toPromise()
         if (!success) {
           console.log()
@@ -173,6 +221,7 @@ function calculateBatchedRunOrder(tasks: Task[]) {
     if (!dependencyGraph[task.id]) dependencyGraph[task.id] = []
 
     task.allDiscoveredDeps.forEach(dep => {
+      if (!tasks.some(_task => _task.id === dep.id)) return // only include if task is present in filtered tasks passed in
       if (!dependencyGraph[dep.id]) dependencyGraph[dep.id] = []
       dependencyGraph[dep.id].push(task.id)
     })
@@ -205,6 +254,7 @@ function* runTask(
     debug?: boolean
     isDryRunMode: boolean
     isRunningConcurrently?: boolean
+    customFunctionName?: string
   },
 ): any {
   console.log()
@@ -251,19 +301,39 @@ function* runTask(
     }),
   )
 
-  let runScript = task.run
+  let runScript =
+    opts?.customFunctionName != null
+      ? task.customFunctions[opts.customFunctionName]
+      : task.run
 
-  if (task.run === '# __TO_BE_LAZY_EVALUATED__') {
+  if (runScript === '# __TO_BE_LAZY_EVALUATED__') {
     const builtLazyTask = yield call(() => getLazyTask(task, lazyContext))
 
     yield call(() => preBuild([builtLazyTask]))
 
-    runScript = builtLazyTask.run
+    runScript =
+      opts?.customFunctionName != null
+        ? builtLazyTask.customFunctions[opts.customFunctionName]
+        : builtLazyTask.run
   }
 
   let backgroundLogTask
 
   try {
+    if (runScript == null) {
+      // if no script defined, just log and continue pass
+      if (opts.customFunctionName != null) {
+        console.log(
+          chalk.gray(
+            `No "${opts.customFunctionName}" script defined for task, continuing`,
+          ),
+        )
+      } else {
+        console.log(chalk.gray('No run script defined for task, continuing'))
+      }
+      return true
+    }
+
     const proc = execa(
       spawnCmd,
       [
@@ -360,7 +430,7 @@ function* runTask(
 
     yield call(async () => await proc)
 
-    if (task.hasGetOutput) {
+    if (task.hasGetOutput && opts?.customFunctionName == null) {
       const outputResult = yield call(() =>
         callTaskGetOutput(task, outputRef.current),
       )
@@ -369,7 +439,7 @@ function* runTask(
       }
     }
 
-    if (outputRef.current != null) {
+    if (outputRef.current != null && opts?.customFunctionName == null) {
       // write/overwrite new out.json file
       yield call(() =>
         fs.writeFile(outJSONFile, JSON.stringify(outputRef.current, null, 2)),

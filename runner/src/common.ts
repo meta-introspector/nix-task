@@ -73,7 +73,7 @@ export async function nixGetTasksFromFlake(
     `,
     )
 
-    return tasks
+    return tasks as any[]
   } finally {
     console.timeEnd('nix getTasksFromFlake')
   }
@@ -143,7 +143,7 @@ async function rewriteTaskPaths(taskPaths: string[]) {
 
 export async function nixGetTasks(
   taskPathsIn: string[],
-  opts?: { forDevShell?: boolean },
+  opts?: { forDevShell?: boolean; reverse?: boolean },
 ) {
   const taskPaths = await rewriteTaskPaths(taskPathsIn)
 

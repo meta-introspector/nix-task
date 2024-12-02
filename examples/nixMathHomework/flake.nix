@@ -20,6 +20,7 @@
             calculate = rec {
               add_3_and_7 = nix-task.lib.mkTask {
                 stableId = [ "add_3_and_7" ];
+                tags = [ "test_calculate" ];
                 dir = ./.;
                 path = with channels.nixpkgs; [
                   channels.nixpkgs.nodejs_20
@@ -43,9 +44,13 @@
                   taskRunFinally echo will exit now
                   echo "got shell hook!"
                 '';
+                custom.destroy = ''
+                  echo "destroy 3"
+                '';
               };
               multiply_by_9 = nix-task.lib.mkTask {
                 stableId = "multiply_by_9";
+                tags = [ "test_calculate" ];
                 deps = { inherit add_3_and_7; };
                 path = with channels.nixpkgs; [
                   nodejs
@@ -64,12 +69,17 @@
                 getOutput = output: output // {
                   numeric = output.result;
                 };
+                # custom.destroy = '' # test no destroy function should just silently pass
+                #   echo "destroy 2"
+                # '';
               };
               display_result = nix-task.lib.mkTask {
                 stableId = [ "display_result" ];
+                tags = [ "test_calculate" ];
                 deps = {
                   inherit multiply_by_9;
                   foo.output.test = "blah";
+                  dummy = null;
                 };
                 path = with channels.nixpkgs; [
                   nodejs
@@ -86,6 +96,16 @@
 
                   echo "got all deps"
                   taskGetDeps
+                '';
+                custom.destroy = { deps, ... }: ''
+                  echo "destroy 1"
+
+                  echo "test file"
+                  file="${builtins.toFile "backendConfig.json" (builtins.toJSON (
+                    { result = "${deps.multiply_by_9.output.numeric}"; }
+                  ))}"
+                  echo "$file"
+                  cat $file
                 '';
               };
 

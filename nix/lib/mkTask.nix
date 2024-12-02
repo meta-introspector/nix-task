@@ -7,6 +7,7 @@ let
 in
 opts@{
   stableId ? null,
+  tags ? null,
   dir ? null,
   path ? [],
   deps ? {},
@@ -15,6 +16,7 @@ opts@{
   run ? "",
   shellHook ? "",
   getOutput ? null,
+  custom ? {},
 }:
 let
   dirString = if dir == null then null else toString dir;
@@ -30,12 +32,14 @@ else
   __type = "task";
   inherit path;
   inherit deps;
+  inherit tags;
   inherit artifacts;
   inherit impureEnvPassthrough;
   dir = dirString;
   run = initialRunString;
   shellHook = initialShellHookString;
   inherit getOutput;
+  customFunctions = mapAttrs (name: value: if isString value then value else "# __TO_BE_LAZY_EVALUATED__") custom;
 
   getLazy = ctx:
     {
@@ -49,5 +53,6 @@ else
       run = if (isString run) then run else (run ctx);
       shellHook = if (isString shellHook) then shellHook else (shellHook ctx);
       inherit getOutput;
+      customFunctions = mapAttrs (name: value: if isString value then value else (value ctx)) custom;
     };
 }

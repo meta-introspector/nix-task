@@ -26,7 +26,7 @@ program
 program
   .command('run <tasks...>')
   .option(
-    '--only',
+    '--only, --only [tags]',
     "only run the specific tasks passed on the command line, ignoring all dependencies. Dependencies which aren't cached will error.",
     false,
   )
@@ -44,6 +44,14 @@ program
     '-J, --concurrency <concurrency>',
     'maximum number of tasks to run at once in parallel. Cannot be used with --interactive',
     parseInt,
+  )
+  .option(
+    '--custom <attribute>',
+    'run custom attribute on each task instead of `run`',
+  )
+  .option(
+    '--reverse',
+    'run tasks in reverse order, useful for destroying resources where it should be run in reverse',
   )
   .option('-g, --graph', 'show a dependency graph of the running order', false)
   .option(

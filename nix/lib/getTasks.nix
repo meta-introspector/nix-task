@@ -68,12 +68,15 @@ let
           (map (pathItem: if (hasAttr "drvPath" pathItem) then pathItem.drvPath else pathItem) taskDefinition.path)
           ++ (getDrvDependenciesFromString taskDefinition.run)
           ++ (getDrvDependenciesFromString taskDefinition.shellHook)
+          ++ (flatten (mapAttrsToList (name: namedRunFunction: getDrvDependenciesFromString namedRunFunction) taskDefinition.customFunctions or {}))
         );
         inherit dir;
         inherit path;
+        tags = taskDefinition.tags or null;
         inherit artifacts;
         inherit impureEnvPassthrough;
         inherit run;
+        inherit customFunctions;
         inherit shellHook;
         hasGetOutput = getOutput != null && isFunction getOutput;
       };
