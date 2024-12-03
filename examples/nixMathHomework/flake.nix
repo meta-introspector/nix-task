@@ -134,6 +134,20 @@
                 env
               '';
             };
+
+            execTest = nix-task.lib.mkTask {
+              stableId = [ "exec_test" ];
+              dir = ./.;
+              path = with channels.nixpkgs; [
+                channels.nixpkgs.nodejs_20
+              ];
+              run = { deps }: ''
+                echo "test 1 home $HOME"
+                echo "test 2 home ${builtins.exec [ "bash" "-c" ''echo "\"$HOME\""'' ]}"
+                echo "test 3 home $(taskEval "task: builtins.exec [ \"execInTask\" \"bash\" \"-c\" '''echo \"\\\"\$HOME\\\"\"''' ]")"
+                echo "^^ above should be the same"
+              '';
+            };
           };
 
         };

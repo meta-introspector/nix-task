@@ -36,24 +36,33 @@
           inherit pkgs;
           yarnManifest = import ./runner/yarn-manifest.nix;
           packageOverrides = {
-            "nix-task@workspace:." = {
-              build = ''
-                export PKG_PATH_BASH="${pkgs.bashInteractive}"
-                export PKG_PATH_COREUTILS="${pkgs.coreutils}"
-                export PKG_PATH_JQ="${pkgs.jq}"
-                export PKG_PATH_CURL="${pkgs.curl}"
-                export PKG_PATH_NIX_LAZY="${pkgs.nix-lazy-trees}"
-                export PKG_PATH_NODEJS="${pkgs.nodejs}"
-                export PKG_PATH_UTIL_LINUX="${pkgs.util-linux}"
-                export CONF_NIX_LIB_PATH="${./nix/lib}"
+            "nix-task@workspace:." =
+              let
+                execInTask = pkgs.writeShellScriptBin "execInTask" ''
+                  ${pkgs.curl}/bin/curl -s --unix-socket $NIX_TASK_CONTROL_SOCKET \
+                    -X POST -H "Content-Type: text/plain" \
+                    --data "$(printf '%s\n' "$@" | ${pkgs.jq}/bin/jq -R . | ${pkgs.jq}/bin/jq -s .)" \
+                    http:/ctrl/evalInTask
+                '';
+              in
+              {
+                build = ''
+                  export PKG_PATH_BASH="${pkgs.bashInteractive}"
+                  export PKG_PATH_COREUTILS="${pkgs.coreutils}"
+                  export PKG_PATH_JQ="${pkgs.jq}"
+                  export PKG_PATH_CURL="${pkgs.curl}"
+                  export PKG_PATH_NIX_LAZY="${pkgs.nix-lazy-trees}"
+                  export PKG_PATH_NODEJS="${pkgs.nodejs}"
+                  export PKG_PATH_UTIL_LINUX="${pkgs.util-linux}"
+                  export CONF_NIX_LIB_PATH="${./nix/lib}"
 
-                node build.js
-              '';
-              # procps needed by tree-kill package
-              binSetup = ''
-                export PATH="$PATH:${pkgs.procps}/bin"
-              '';
-            };
+                  node build.js
+                '';
+                # procps needed by tree-kill package
+                binSetup = ''
+                  export PATH="$PATH:${pkgs.procps}/bin:${execInTask}/bin"
+                '';
+              };
           };
         };
       in

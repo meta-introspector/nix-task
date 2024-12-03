@@ -7,12 +7,19 @@ let
     (cd $REPO_ROOT/runner && yarn node build)
     node $REPO_ROOT/runner/nix-task "$@"
   '';
+  execInTask = writeShellScriptBin "execInTask" ''
+    curl -s --unix-socket $NIX_TASK_CONTROL_SOCKET \
+      -X POST -H "Content-Type: text/plain" \
+      --data "$(printf '%s\n' "$@" | jq -R . | jq -s .)" \
+      http:/ctrl/evalInTask
+  '';
 in
 mkShell {
   buildInputs = [
     nodejs
     yarn-berry
     nixTaskDev
+    execInTask
   ];
 
   shellHook = ''

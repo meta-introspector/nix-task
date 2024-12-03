@@ -17,3 +17,4 @@ nix-task run ./examples/nixMathHomework#
 nix-task run --only ./examples/nixMathHomework#example.calculate.add_3_and_7
 nix-task run --reverse --custom destroy --only-tags test_calculate -g ./examples/nixMathHomework#
 nix-task run --reverse --custom destroy --only-tags test_calculate ./examples/nixMathHomework#
+nix-task run --only ./examples/nixMathHomework#example.execTest

@@ -59,9 +59,10 @@ export async function setupRunEnvironment(
   const server = http.createServer(async (req, res) => {
     if (req.url === '/eval') {
       try {
-        const requestBody = await text(req)
+        const requestBody = JSON.parse(await text(req))
         const evalResponse = await nixEval(
-          `(${requestBody}) ${task.flakeAttributePath}`,
+          `(${requestBody.args}) ${task.flakeAttributePath}`,
+          requestBody?.environment ?? null,
         )
         res.writeHead(200)
         res.end(
@@ -235,9 +236,13 @@ function taskGetDeps {
 export -f taskGetDeps
 
 function taskEval {
+  postData="$(${
+    process.env.PKG_PATH_JQ
+  }/bin/jq -M -n --arg args "$*" '{"environment":env,"args":$args}')"
+
   ${process.env.PKG_PATH_CURL}/bin/curl -s --unix-socket $TASK_CONTROL_SOCKET \
     -X POST -H "Content-Type: text/plain" \
-    --data "$*" \
+    --data "$postData" \
     http:/ctrl/eval
 }
 
