@@ -82,8 +82,8 @@ export default async function run(
   }
 
   const onlyTags =
-    options.only != null && typeof options.only === 'string'
-      ? options.only.split(',').map((tag: string) => tag.trim())
+    options.onlyTags != null && typeof options.onlyTags === 'string'
+      ? options.onlyTags.split(',').map((tag: string) => tag.trim())
       : null
 
   const filteredTasks =

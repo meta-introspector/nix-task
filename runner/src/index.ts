@@ -26,9 +26,13 @@ program
 program
   .command('run <tasks...>')
   .option(
-    '--only, --only [tags]',
+    '--only',
     "only run the specific tasks passed on the command line, ignoring all dependencies. Dependencies which aren't cached will error.",
     false,
+  )
+  .option(
+    '--only-tags, --only-tags [tags]',
+    'only run tasks with the specified tags',
   )
   .option(
     '-i, --interactive',
