@@ -32,6 +32,8 @@ export default async function run(
     reverse: options.reverse === true,
   })
 
+  const originalTasks = tasks
+
   if (options?.reverse) {
     // reverse dependencies so it runs in reverse order
     tasks = tasks.map(task => {
@@ -40,6 +42,7 @@ export default async function run(
       )
       return {
         ...task,
+        originalDeps: task.allDiscoveredDeps,
         allDiscoveredDeps: dependsOnSelf,
       }
     })
@@ -96,14 +99,20 @@ export default async function run(
 
   const sortedTasks = onlyTask
     ? [[onlyTask.id]]
-    : calculateBatchedRunOrder(filteredTasks)
+    : calculateBatchedRunOrder(filteredTasks, originalTasks)
 
   if (options.graph) {
     console.log(
       JSON.stringify(
         sortedTasks.map(group =>
-          group.map(
-            taskId => tasks.find(task => task.id === taskId)?.prettyRef,
+          group.map(taskId =>
+            taskId.startsWith('OUTPUT:')
+              ? `(Output Only) ${
+                  tasks.find(
+                    task => task.id === taskId.substring('OUTPUT:'.length),
+                  )?.prettyRef
+                }`
+              : tasks.find(task => task.id === taskId)?.prettyRef,
           ),
         ),
         null,
@@ -133,8 +142,13 @@ export default async function run(
   const taskDoneStatus: { [taskId: string]: boolean } = {}
 
   top: for (const group of sortedTasks) {
-    for (const idToRun of group) {
+    for (const _idToRun of group) {
       queue.add(async function () {
+        let idToRun = _idToRun
+
+        const isOutputOnly = idToRun.startsWith('OUTPUT:')
+        if (isOutputOnly) idToRun = idToRun.substring('OUTPUT:'.length)
+
         const task = tasks.find(task => task.id === idToRun)!
 
         // wait for task dependencies to finish (only has any effect when running tasks concurrently)
@@ -143,20 +157,37 @@ export default async function run(
             task,
             taskIdsToRun,
             taskDoneStatus,
+            isOutputOnly,
           )
         ) {
           if (options.debug) {
-            console.log(
-              'tasks not finished for task',
-              task.flakeAttributePath,
-              taskIdsToRun,
-              task.allDiscoveredDeps.filter(
-                dep =>
-                  !(taskIdsToRun.includes(dep.id)
-                    ? taskDoneStatus[dep.id] === true
-                    : true),
-              ),
-            )
+            if (isOutputOnly) {
+              console.log(
+                'tasks not finished for task',
+                _idToRun,
+                task.flakeAttributePath,
+                taskIdsToRun,
+                (task as TaskWithOriginalDeps).originalDeps?.filter(
+                  dep =>
+                    !(taskIdsToRun.includes(`OUTPUT:${dep.id}`)
+                      ? taskDoneStatus[`OUTPUT:${dep.id}`] === true
+                      : true),
+                ),
+              )
+            } else {
+              console.log(
+                'tasks not finished for task',
+                _idToRun,
+                task.flakeAttributePath,
+                taskIdsToRun,
+                task.allDiscoveredDeps.filter(
+                  dep =>
+                    !(taskIdsToRun.includes(dep.id)
+                      ? taskDoneStatus[dep.id] === true
+                      : true),
+                ),
+              )
+            }
           }
           await new Promise(resolve => {
             const handler = () => {
@@ -165,6 +196,7 @@ export default async function run(
                   task,
                   taskIdsToRun,
                   taskDoneStatus,
+                  isOutputOnly,
                 )
               ) {
                 queue.removeListener('completed', handler)
@@ -179,6 +211,7 @@ export default async function run(
           interactive: options.interactive,
           debug: options.debug,
           isDryRunMode,
+          isOutputOnly,
           isRunningConcurrently,
           customFunctionName: options.custom ?? undefined,
         }).toPromise()
@@ -188,7 +221,7 @@ export default async function run(
           console.log()
           process.exit(1)
         } else {
-          taskDoneStatus[task.id] = true
+          taskDoneStatus[_idToRun] = true
         }
       })
     }
@@ -214,35 +247,104 @@ export default async function run(
   }
 }
 
-function calculateBatchedRunOrder(tasks: Task[]) {
+type TaskWithOriginalDeps = Task & { originalDeps?: Task[] }
+
+function calculateBatchedRunOrder(
+  filteredTasks: TaskWithOriginalDeps[],
+  allTasks: TaskWithOriginalDeps[],
+) {
   const dependencyGraph: any = {}
 
-  tasks.forEach(task => {
+  filteredTasks.forEach(task => {
     if (!dependencyGraph[task.id]) dependencyGraph[task.id] = []
 
     task.allDiscoveredDeps.forEach(dep => {
-      if (!tasks.some(_task => _task.id === dep.id)) return // only include if task is present in filtered tasks passed in
+      if (!filteredTasks.some(_task => _task.id === dep.id)) {
+        // if dependency is not present in filteredTasks, then just push a output-only variant which will fetch the output if it is missing
+        if (!dependencyGraph[`OUTPUT:${dep.id}`])
+          dependencyGraph[`OUTPUT:${dep.id}`] = []
+        dependencyGraph[`OUTPUT:${dep.id}`].push(task.id)
+        return
+      }
+
       if (!dependencyGraph[dep.id]) dependencyGraph[dep.id] = []
       dependencyGraph[dep.id].push(task.id)
     })
+
+    // ensure outputs are present first when operating in reverse mode
+    if (task.originalDeps != null) {
+      if (!dependencyGraph[`OUTPUT:${task.id}`])
+        dependencyGraph[`OUTPUT:${task.id}`] = []
+
+      task.originalDeps.forEach(dep => {
+        if (!dependencyGraph[`OUTPUT:${dep.id}`])
+          dependencyGraph[`OUTPUT:${dep.id}`] = []
+        dependencyGraph[`OUTPUT:${dep.id}`].push(task.id)
+        dependencyGraph[`OUTPUT:${dep.id}`].push(`OUTPUT:${task.id}`)
+      })
+    }
   })
 
-  // TODO while the batching is nice to look at, it's not the most efficient way to do this
-  // e.g take two tasks, and another task which depends on task 1. If task 2 takes ages to complete
-  // batching will cause task 3 to wait until task 2 has finished even though there's no explicit dependency.
+  // clear any empty output-only trees and also add any missing ones
+  for (const key of Object.keys(dependencyGraph)) {
+    if (key.startsWith('OUTPUT:')) {
+      const task =
+        (allTasks.find(
+          _task => _task.id === key.substring('OUTPUT:'.length),
+        ) as TaskWithOriginalDeps) ?? null
+
+      if (task?.allDiscoveredDeps != null) {
+        task.allDiscoveredDeps.forEach(dep => {
+          if (!dependencyGraph[`OUTPUT:${dep.id}`])
+            dependencyGraph[`OUTPUT:${dep.id}`] = []
+          dependencyGraph[`OUTPUT:${dep.id}`].push(`OUTPUT:${task.id}`)
+        })
+      }
+
+      if (dependencyGraph[key].length === 0) {
+        delete dependencyGraph[key]
+        for (const other of Object.values(dependencyGraph as any[])) {
+          if (other.includes(key)) {
+            removeItem(other, key)
+          }
+        }
+      }
+    }
+  }
+
+  // self test for missing keys as otherwise batchingToposort will fail with forEach error
+  // for (const other of Object.values(dependencyGraph as any[])) {
+  //   for (const key of other) {
+  //     if (!dependencyGraph[key]) {
+  //       console.log('MISSING KEY', key)
+  //     }
+  //   }
+  // }
+
   const runOrder: string[][] = batchingToposort(dependencyGraph)
 
   return runOrder
 }
 
 function areAllDependenciesSatisifiedForTask(
-  task: Task,
+  task: TaskWithOriginalDeps,
   taskIdsToRun: string[],
   doneStatus: { [taskId: string]: boolean },
+  isOutputOnly: boolean,
 ) {
-  return task.allDiscoveredDeps.every(dep =>
-    taskIdsToRun.includes(dep.id) ? doneStatus[dep.id] === true : true,
-  )
+  if (isOutputOnly) {
+    return (
+      task.originalDeps?.every(dep =>
+        taskIdsToRun.includes(`OUTPUT:${dep.id}`)
+          ? doneStatus[`OUTPUT:${dep.id}`] === true
+          : true,
+      ) ?? true
+    )
+  } else {
+    return task.allDiscoveredDeps.every(dep =>
+      taskIdsToRun.includes(dep.id) ? doneStatus[dep.id] === true : true,
+    )
+  }
 }
 
 let lastTaskIdToBeLogged: string | null = null
@@ -254,6 +356,7 @@ function* runTask(
     debug?: boolean
     isDryRunMode: boolean
     isRunningConcurrently?: boolean
+    isOutputOnly?: boolean
     customFunctionName?: string
   },
 ): any {
@@ -265,17 +368,32 @@ function* runTask(
     headerPrefix += chalk.bold.yellow('(dry run)') + ' '
   }
 
-  console.log(
-    chalk.yellow('──') +
-      headerPrefix +
-      chalk.yellow(
-        ''.padEnd(
-          process.stdout.columns - 2 - stripAnsi(headerPrefix).length,
-          '─',
+  if (!opts.isOutputOnly) {
+    console.log(
+      chalk.yellow('──') +
+        headerPrefix +
+        chalk.yellow(
+          ''.padEnd(
+            process.stdout.columns - 2 - stripAnsi(headerPrefix).length,
+            '─',
+          ),
         ),
-      ),
-  )
-  console.log()
+    )
+    console.log()
+  } else {
+    headerPrefix = ' Get output ' + task.prettyRef + ' '
+    console.log(
+      chalk.gray('──') +
+        headerPrefix +
+        chalk.gray(
+          ''.padEnd(
+            process.stdout.columns - 2 - stripAnsi(headerPrefix).length,
+            '─',
+          ),
+        ),
+    )
+    console.log()
+  }
 
   lastTaskIdToBeLogged = task.id
 
@@ -302,7 +420,9 @@ function* runTask(
   )
 
   let runScript =
-    opts?.customFunctionName != null
+    opts?.isOutputOnly === true
+      ? task.fetchOutput
+      : opts?.customFunctionName != null
       ? task.customFunctions[opts.customFunctionName]
       : task.run
 
@@ -312,7 +432,9 @@ function* runTask(
     yield call(() => preBuild([builtLazyTask]))
 
     runScript =
-      opts?.customFunctionName != null
+      opts?.isOutputOnly === true
+        ? builtLazyTask.fetchOutput
+        : opts?.customFunctionName != null
         ? builtLazyTask.customFunctions[opts.customFunctionName]
         : builtLazyTask.run
   }
@@ -322,7 +444,9 @@ function* runTask(
   try {
     if (runScript == null) {
       // if no script defined, just log and continue pass
-      if (opts.customFunctionName != null) {
+      if (opts.isOutputOnly === true) {
+        console.log(chalk.gray(`No fetchOutput defined for task, continuing`))
+      } else if (opts.customFunctionName != null) {
         console.log(
           chalk.gray(
             `No "${opts.customFunctionName}" script defined for task, continuing`,
@@ -430,7 +554,10 @@ function* runTask(
 
     yield call(async () => await proc)
 
-    if (task.hasGetOutput && opts?.customFunctionName == null) {
+    if (
+      task.hasGetOutput &&
+      (opts?.customFunctionName == null || opts.isOutputOnly === true)
+    ) {
       const outputResult = yield call(() =>
         callTaskGetOutput(task, outputRef.current),
       )
@@ -439,7 +566,10 @@ function* runTask(
       }
     }
 
-    if (outputRef.current != null && opts?.customFunctionName == null) {
+    if (
+      outputRef.current != null &&
+      (opts?.customFunctionName == null || opts.isOutputOnly === true)
+    ) {
       // write/overwrite new out.json file
       yield call(() =>
         fs.writeFile(outJSONFile, JSON.stringify(outputRef.current, null, 2)),
@@ -469,4 +599,14 @@ function createProcessOutputChannel(stream: NodeJS.ReadableStream) {
       lineInterface.close()
     }
   })
+}
+
+function removeItem(array: any[], item: any) {
+  var i = array.length
+
+  while (i--) {
+    if (array[i] === item) {
+      array.splice(i, 1)
+    }
+  }
 }

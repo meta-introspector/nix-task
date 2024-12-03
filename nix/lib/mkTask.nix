@@ -15,6 +15,7 @@ opts@{
   impureEnvPassthrough ? [],
   run ? "",
   shellHook ? "",
+  fetchOutput ? null,
   getOutput ? null,
   custom ? {},
 }:
@@ -39,6 +40,7 @@ else
   run = initialRunString;
   shellHook = initialShellHookString;
   inherit getOutput;
+  fetchOutput = if fetchOutput == null then null else (if isString fetchOutput then fetchOutput else "# __TO_BE_LAZY_EVALUATED__");
   customFunctions = mapAttrs (name: value: if isString value then value else "# __TO_BE_LAZY_EVALUATED__") custom;
 
   getLazy = ctx:
@@ -53,6 +55,7 @@ else
       run = if (isString run) then run else (run ctx);
       shellHook = if (isString shellHook) then shellHook else (shellHook ctx);
       inherit getOutput;
+      fetchOutput = if fetchOutput == null then null else (if isString fetchOutput then fetchOutput else (fetchOutput ctx));
       customFunctions = mapAttrs (name: value: if isString value then value else (value ctx)) custom;
     };
 }

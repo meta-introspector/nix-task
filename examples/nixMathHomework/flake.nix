@@ -14,7 +14,19 @@
 
       outputsBuilder = channels: {
 
-        tasks = {
+        tasks = rec {
+
+          outside_dependency = nix-task.lib.mkTask {
+            stableId = [ "outside_dependency" ];
+            dir = ./.;
+            path = with channels.nixpkgs; [ jq ];
+            run = ''
+              taskSetOutput "$(jq --null-input -cM --arg result 123 '{result:$result}')"
+            '';
+            fetchOutput = ''
+              taskSetOutput "$(jq --null-input -cM --arg result 123 '{result:$result}')"
+            '';
+          };
 
           example = {
             calculate = rec {
@@ -22,6 +34,7 @@
                 stableId = [ "add_3_and_7" ];
                 tags = [ "test_calculate" ];
                 dir = ./.;
+                deps = { inherit outside_dependency; };
                 path = with channels.nixpkgs; [
                   channels.nixpkgs.nodejs_20
                 ];
@@ -46,6 +59,9 @@
                 '';
                 custom.destroy = ''
                   echo "destroy 3"
+                '';
+                fetchOutput = ''
+                  expr 3 + 7 > $out/homework
                 '';
               };
               multiply_by_9 = nix-task.lib.mkTask {
@@ -72,10 +88,15 @@
                 # custom.destroy = '' # test no destroy function should just silently pass
                 #   echo "destroy 2"
                 # '';
+                fetchOutput = { deps, ... }: ''
+                  value=`cat ${deps.add_3_and_7.artifacts.homework}`
+                  result=`expr $value \* 9`
+                  taskSetOutput "$(jq --null-input -cM --arg result $result '{result:$result}')"
+                '';
               };
               display_result = nix-task.lib.mkTask {
                 stableId = [ "display_result" ];
-                tags = [ "test_calculate" ];
+                tags = [ "test_calculate" "test_result" ];
                 deps = {
                   inherit multiply_by_9;
                   foo.output.test = "blah";

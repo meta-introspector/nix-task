@@ -31,6 +31,7 @@ export interface Task {
   impureEnvPassthrough: string[]
   storeDependencies: string[]
   run: string
+  fetchOutput?: string | null
   customFunctions: { [key: string]: string }
   shellHook?: string
   hasGetOutput?: boolean
