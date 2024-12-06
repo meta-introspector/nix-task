@@ -28,3 +28,6 @@ nix-task run --reverse --custom destroy --only-tags test_calculate ./examples/ni
 # clear output directory and try filtering by tag where dependency outputs need to be fetched
 rm -rf .nix-task || true
 nix-task run --only-tags test_result ./examples/nixMathHomework#
+
+# mimic a typical deployment
+nix-task run -g --only-tags test_e2e ./examples/nixMathHomework#complex_environment_example_1

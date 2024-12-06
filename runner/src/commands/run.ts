@@ -286,33 +286,68 @@ function calculateBatchedRunOrder(
   })
 
   // clear any empty output-only trees and also add any missing ones
-  for (const key of Object.keys(dependencyGraph)) {
-    if (key.startsWith('OUTPUT:')) {
-      const task =
-        (allTasks.find(
-          _task => _task.id === key.substring('OUTPUT:'.length),
-        ) as TaskWithOriginalDeps) ?? null
+  while (true) {
+    let didChangeDependencyGraph = false
 
-      if (task?.allDiscoveredDeps != null) {
-        task.allDiscoveredDeps.forEach(dep => {
-          if (!dependencyGraph[`OUTPUT:${dep.id}`])
-            dependencyGraph[`OUTPUT:${dep.id}`] = []
-          dependencyGraph[`OUTPUT:${dep.id}`].push(`OUTPUT:${task.id}`)
-        })
-      }
+    for (const key of Object.keys(dependencyGraph)) {
+      if (key.startsWith('OUTPUT:')) {
+        const task =
+          (allTasks.find(
+            _task => _task.id === key.substring('OUTPUT:'.length),
+          ) as TaskWithOriginalDeps) ?? null
 
-      if (dependencyGraph[key].length === 0) {
-        delete dependencyGraph[key]
-        for (const other of Object.values(dependencyGraph as any[])) {
-          if (other.includes(key)) {
-            removeItem(other, key)
+        if (task?.allDiscoveredDeps != null) {
+          task.allDiscoveredDeps.forEach(dep => {
+            if (!dependencyGraph[`OUTPUT:${dep.id}`]) {
+              dependencyGraph[`OUTPUT:${dep.id}`] = []
+              didChangeDependencyGraph = true
+            }
+            if (
+              !dependencyGraph[`OUTPUT:${dep.id}`].includes(`OUTPUT:${task.id}`)
+            ) {
+              dependencyGraph[`OUTPUT:${dep.id}`].push(`OUTPUT:${task.id}`)
+              didChangeDependencyGraph = true
+            }
+          })
+        }
+
+        if (dependencyGraph[key].length === 0) {
+          delete dependencyGraph[key]
+          for (const other of Object.values(dependencyGraph as any[])) {
+            if (other.includes(key)) {
+              removeItem(other, key)
+              didChangeDependencyGraph = true
+            }
           }
         }
       }
     }
+
+    if (!didChangeDependencyGraph) break
   }
 
-  // self test for missing keys as otherwise batchingToposort will fail with forEach error
+  // for debugging:
+  // function depIdToTask(id: string) {
+  //   if (id.startsWith('OUTPUT:')) {
+  //     return allTasks.find(task => task.id === id.substring('OUTPUT:'.length))
+  //   } else {
+  //     return allTasks.find(task => task.id === id)
+  //   }
+  // }
+  // console.log(
+  //   chain(dependencyGraph)
+  //     .pickBy((val, key) => key.startsWith('OUTPUT:'))
+  //     .mapValues(val =>
+  //       val.map(
+  //         item => item.substring(0, 10) + ' ' + depIdToTask(item)?.prettyRef,
+  //       ),
+  //     )
+  //     .mapKeys(
+  //       (val, key) => key.substring(0, 10) + ' ' + depIdToTask(key)?.prettyRef,
+  //     )
+  //     .value(),
+  // )
+  // // self test for missing keys as otherwise batchingToposort will fail with forEach error
   // for (const other of Object.values(dependencyGraph as any[])) {
   //   for (const key of other) {
   //     if (!dependencyGraph[key]) {

@@ -171,6 +171,97 @@
             };
           };
 
+          # don't modify this and instead duplicate it as it contains a specific bug where dependency ordering of outputs
+          # when doing --only-tags test_e2e was incorrect
+          complex_environment_example_1 = rec {
+            infra = rec {
+              kubernetes_cluster =
+                let
+                  prerequisites = nix-task.lib.mkTask {
+                    stableId = "infra/kubernetes_cluster/prerequisites";
+                    deps = {
+
+                    };
+                  };
+                  infrastructure = nix-task.lib.mkTask {
+                    stableId = "infra/kubernetes_cluster/infrastructure";
+                    deps = {
+                      inherit prerequisites;
+                    };
+                  };
+                  resources = nix-task.lib.mkTask {
+                    stableId = "infra/kubernetes_cluster/resources";
+                    deps = {
+                      inherit infrastructure;
+                    };
+                  };
+                in
+                {
+                  inherit prerequisites;
+                  inherit infrastructure;
+                  inherit resources;
+                  output = nix-task.lib.mkTaskOutput {
+                    deps = {
+                      inherit resources;
+                      inherit infrastructure;
+                    };
+                    getOutput = { deps, ... }: deps.infrastructure.output;
+                  };
+                };
+
+              message_bus = nix-task.lib.mkTask {
+                stableId = "infra/message_bus";
+                deps = {
+                  inherit kubernetes_cluster;
+                };
+              };
+            };
+
+            staging = rec {
+              namespace = nix-task.lib.mkTask {
+                stableId = "staging/namespace";
+                tags = [ "environment" ];
+                deps = {
+                  inherit (infra) kubernetes_cluster;
+                };
+              };
+              service_1 = nix-task.lib.mkTask {
+                stableId = "staging/service_1";
+                tags = [ "environment" ];
+                deps = {
+                  inherit (infra) kubernetes_cluster;
+                  inherit namespace;
+                };
+              };
+              service_2 = nix-task.lib.mkTask {
+                stableId = "staging/service_2";
+                tags = [ "environment" ];
+                deps = {
+                  inherit (infra) kubernetes_cluster;
+                  inherit namespace;
+                };
+              };
+              service_3 = nix-task.lib.mkTask {
+                stableId = "staging/service_3";
+                tags = [ "environment" ];
+                deps = {
+                  inherit (infra) kubernetes_cluster message_bus;
+                  inherit namespace;
+                };
+              };
+              test = {
+                e2e = nix-task.lib.mkTask {
+                  stableId = "staging/test_e2e";
+                  tags = [ "test_e2e" ];
+                  deps = {
+                    inherit (infra) message_bus;
+                    inherit namespace;
+                    inherit service_3;
+                  };
+                };
+              };
+            };
+          };
         };
 
       };
