@@ -2,15 +2,15 @@
   "nodes": {
     "nixpkgs": {
       "locked": {
-        "lastModified": 1704295289,
-        "narHash": "sha256-9WZDRfpMqCYL6g/HNWVvXF0hxdaAgwgIGeLYiOhmes8=",
-        "owner": "nixos",
+        "lastModified": 1720535198,
+        "narHash": "sha256-zwVvxrdIzralnSbcpghA92tWu2DV2lwv89xZc8MTrbg=",
+        "owner": "meta-introspector",
         "repo": "nixpkgs",
-        "rev": "b0b2c5445c64191fd8d0b31f2b1a34e45a64547d",
+        "rev": "205fd4226592cc83fd4c0885a3e4c9c400efabb5",
         "type": "github"
       },
       "original": {
-        "owner": "nixos",
+        "owner": "meta-introspector",
         "ref": "nixos-23.11",
         "repo": "nixpkgs",
         "type": "github"
@@ -43,15 +43,15 @@
         "systems": "systems"
       },
       "locked": {
-        "lastModified": 1701680307,
-        "narHash": "sha256-kAuep2h5ajznlPMD9rnQyffWG8EM/C73lejGofXvdM8=",
-        "owner": "numtide",
+        "lastModified": 1731533236,
+        "narHash": "sha256-l0KFg5HjrsfsO/JpG+r7fRrqm12kzFHyUHqHCVpMMbI=",
+        "owner": "meta-introspector",
         "repo": "flake-utils",
-        "rev": "4022d587cbbfd70fe950c1e2083a02621806a725",
+        "rev": "11707dc2f618dd54ca8739b309ec4fc024de578b",
         "type": "github"
       },
       "original": {
-        "owner": "numtide",
+        "owner": "meta-introspector",
         "repo": "flake-utils",
         "type": "github"
       }
@@ -66,15 +66,15 @@
         ]
       },
       "locked": {
-        "lastModified": 1704216050,
-        "narHash": "sha256-G7RUiC8Newf5lco6Y2PLMp6GnGxFWbhP8nhM7TcAnwg=",
-        "owner": "madjam002",
+        "lastModified": 1733161728,
+        "narHash": "sha256-vGpL45tTs628BK99eLRd3yRDKiQ+j/vnktn4hv0CMKg=",
+        "owner": "meta-introspector",
         "repo": "yarnpnp2nix",
-        "rev": "bc4cab112f4a8fd906a0338710490cf57b8849c2",
+        "rev": "82d153d11b9d8e1a255028e370709c8bcebc37cb",
         "type": "github"
       },
       "original": {
-        "owner": "madjam002",
+        "owner": "meta-introspector",
         "repo": "yarnpnp2nix",
         "type": "github"
       }
