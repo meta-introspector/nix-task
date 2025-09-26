@@ -7,6 +7,8 @@
     yarnpnp2nix.url = "github:meta-introspector/yarnpnp2nix";
     yarnpnp2nix.inputs.nixpkgs.follows = "nixpkgs";
     yarnpnp2nix.inputs.utils.follows = "utils";
+
+
   };
 
   outputs = inputs@{ self, nixpkgs, utils, ... }:
@@ -55,6 +57,10 @@
         };
         packages = {
           default = runnerYarnPackages."nix-task@workspace:.";
+        };
+
+        tasks = {
+          gemini = pkgs.callPackage ./nix/tasks/gemini.nix { inherit pkgs; gemini-cli = pkgs.gemini-cli; };
         };
       }
     )) // {
