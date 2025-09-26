@@ -61,6 +61,7 @@
 
         tasks = {
           gemini = pkgs.callPackage ./nix/tasks/gemini.nix { inherit pkgs; gemini-cli = pkgs.gemini-cli; };
+          run-gemini-cli = pkgs.callPackage ./nix/tasks/run-gemini-cli.nix { inherit pkgs; };
         };
       }
     )) // {
