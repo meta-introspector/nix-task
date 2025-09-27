@@ -67,8 +67,18 @@
           helius-block-processor = pkgs.callPackage ./nix/tasks/helius-block-processor.nix { inherit pkgs; };
           solana-nix-trigger-interpreter = pkgs.callPackage ./nix/tasks/solana-nix-trigger-interpreter.nix { inherit pkgs; };
         };
+
+        apps = {
+          gemini = { type = "app"; program = "${tasks.gemini.run}"; };
+          run-gemini-cli = { type = "app"; program = "${tasks.run-gemini-cli.run}"; };
+          solana-ai-trigger = { type = "app"; program = "${tasks.solana-ai-trigger.run}"; };
+          process-solana-nar = { type = "app"; program = "${tasks.process-solana-nar.run}"; };
+          helius-block-processor = { type = "app"; program = "${tasks.helius-block-processor.run}"; };
+          solana-nix-trigger-interpreter = { type = "app"; program = "${tasks.solana-nix-trigger-interpreter.run}"; };
+        };
       }
     )) // {
       lib = import ./nix/lib { lib = nixpkgsLib; };
     };
+}
 }
