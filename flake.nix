@@ -77,5 +77,5 @@
           solana-nix-trigger-interpreter = { type = "app"; program = "${tasks.solana-nix-trigger-interpreter.run}"; };
         };
       }
-    );
+    )
 
