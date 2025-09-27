@@ -51,7 +51,7 @@
           };
         };
       in
-      rec {
+      {
         devShells.default = import ./shell.nix {
           inherit pkgs;
         };
