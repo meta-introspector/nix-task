@@ -8,7 +8,7 @@
     yarnpnp2nix.inputs.nixpkgs.follows = "nixpkgs";
     yarnpnp2nix.inputs.utils.follows = "utils";
 
-
+    base-job.url = "path:./nix/base-job";
   };
 
   outputs = inputs@{ self, nixpkgs, utils, ... }:
