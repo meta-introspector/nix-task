@@ -80,5 +80,4 @@
     )) // {
       lib = import ./nix/lib { lib = nixpkgsLib; };
     };
-}
-}
+
