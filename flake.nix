@@ -11,7 +11,7 @@
     base-job.url = "path:./nix/base-job";
   };
 
-  outputs = inputs@{ self, nixpkgs, utils, ... }:
+  outputs = inputs@{ self, nixpkgs, utils, base-job, ... }:
     let
       nixpkgsLib = nixpkgs.lib;
     in
@@ -69,10 +69,10 @@
         };
 
         apps = {
-          gemini = { type = "app"; program = "${tasks.gemini.run}"; };
-          run-gemini-cli = { type = "app"; program = "${tasks.run-gemini-cli.run}"; };
-          solana-ai-trigger = { type = "app"; program = "${tasks.solana-ai-trigger.run}"; };
-          process-solana-nar = { type = "app"; program = "${tasks.process-solana-nar.run}"; };
+          gemini = base-job.lib.mkBaseJob { name = "gemini"; runScript = tasks.gemini.run; };
+          run-gemini-cli = base-job.lib.mkBaseJob { name = "run-gemini-cli"; runScript = tasks.run-gemini-cli.run; };
+          solana-ai-trigger = base-job.lib.mkBaseJob { name = "solana-ai-trigger"; runScript = tasks.solana-ai-trigger.run; };
+          process-solana-nar = base-job.lib.mkBaseJob { name = "process-solana-nar"; runScript = tasks.process-solana-nar.run; };
           helius-block-processor = { type = "app"; program = "${tasks.helius-block-processor.run}"; };
           solana-nix-trigger-interpreter = { type = "app"; program = "${tasks.solana-nix-trigger-interpreter.run}"; };
         };
