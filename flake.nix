@@ -2,7 +2,7 @@
   description = "Nix Task Runner";
 
   inputs = {
-    nixpkgs.url = "github:meta-introspector/nixpkgs/nixos-23.11";
+  inputs.nixpkgs.url = "github:meta-introspector/nixpkgs?ref=feature/CRQ-016-nixify";
     utils.url = "github:meta-introspector/flake-utils";
     yarnpnp2nix.url = "github:meta-introspector/yarnpnp2nix";
     yarnpnp2nix.inputs.nixpkgs.follows = "nixpkgs";
