@@ -2,7 +2,7 @@
   description = "A very basic flake";
 
   inputs = {
-    nixpkgs.url = "github:nixos/nixpkgs/nixos-23.11";
+  inputs.nixpkgs.url = "github:meta-introspector/nixpkgs?ref=feature/CRQ-016-nixify";
     utils.url = "github:gytis-ivaskevicius/flake-utils-plus";
     nix-task.url = "../../.";
     nix-task.inputs.nixpkgs.follows = "nixpkgs";
