@@ -2,8 +2,8 @@
   description = "Base flake for common job definitions and utilities";
 
   inputs = {
-    nixpkgs.url = "github:meta-introspector/nixpkgs/nixos-23.11";
-    utils.url = "github:meta-introspector/flake-utils";
+  inputs.nixpkgs.url = "github:meta-introspector/nixpkgs?ref=feature/CRQ-016-nixify";
+    utils.url = "github:meta-introspector/flake-utils?ref=feature/CRQ-016-nixify";
   };
 
   outputs = { self, nixpkgs, utils }:
