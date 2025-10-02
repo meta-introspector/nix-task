@@ -13,8 +13,8 @@
     };
 
     # Add other common inputs if needed, e.g., nixpkgs
-    nixpkgs.url = "github:meta-introspector/nixpkgs/nixos-23.11";
-    utils.url = "github:meta-introspector/flake-utils";
+    nixpkgs.url = "github:meta-introspector/nixpkgs?ref=feature/CRQ-016-nixify";
+    utils.url = "github:meta-introspector/flake-utils?ref=feature/CRQ-016-nixify";
   };
 
   outputs = { self, nixpkgs, utils, example-repo, ... }:
