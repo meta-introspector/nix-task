@@ -8,7 +8,7 @@
     yarnpnp2nix.inputs.nixpkgs.follows = "nixpkgs";
     yarnpnp2nix.inputs.utils.follows = "utils";
 
-    base-job.url = "path:./nix/base-job";
+    base-job.url = "github:meta-introspector/time-2025/feature/foaf?dir=09/26/jobs/vendor/nix-task/nix/base-job";
   };
 
   outputs = inputs@{ self, nixpkgs, utils, base-job, ... }:

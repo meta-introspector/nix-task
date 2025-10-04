@@ -2,7 +2,7 @@
   description = "A flake to call the run-gemini-cli task";
 
   inputs = {
-    nix-task.url = "path:../.."; # Reference the parent nix-task flake
+    nix-task.url = "github:meta-introspector/time-2025/feature/foaf?dir=09/26/jobs/vendor/nix-task";
   };
 
   outputs = { self, nix-task }: {
