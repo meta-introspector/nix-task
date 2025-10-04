@@ -1,4 +1,4 @@
-{ lib }:
+{ pkgs, lib, path ? [], run ? "", impureEnvPassthrough ? [], stableId ? null }:
 
 with builtins;
 with lib;

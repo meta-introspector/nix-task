@@ -1,5 +1,5 @@
 
-{ lib, pkgs, gemini-cli }:
+{ lib, pkgs, gemini-cli ? null }:
 
 pkgs.callPackage ../lib/mkTask.nix {
   stableId = "gemini-cli-interactive";
