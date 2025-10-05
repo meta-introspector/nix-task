@@ -4,9 +4,7 @@
   inputs = {
   inputs.nixpkgs.url = "github:meta-introspector/nixpkgs?ref=feature/CRQ-016-nixify";
     utils.url = "github:meta-introspector/flake-utils";
-    yarnpnp2nix.url = "github:meta-introspector/yarnpnp2nix";
-    yarnpnp2nix.inputs.nixpkgs.follows = "nixpkgs";
-    yarnpnp2nix.inputs.utils.follows = "utils";
+    yarnpnp2nix = { url = "github:meta-introspector/yarnpnp2nix"; inputs.nixpkgs.follows = "nixpkgs"; inputs.utils.follows = "utils"; };
 
     base-job.url = "github:meta-introspector/time-2025/feature/foaf?dir=09/26/jobs/vendor/nix-task/nix/base-job";
   };
@@ -27,7 +25,7 @@
           ];
         };
 
-        mkYarnPackagesFromManifest = inputs.yarnpnp2nix.lib."${system}".mkYarnPackagesFromManifest;
+        inherit (inputs.yarnpnp2nix.lib."${system}") mkYarnPackagesFromManifest;
         runnerYarnPackages = mkYarnPackagesFromManifest {
           inherit pkgs;
           yarnManifest = import ./runner/yarn-manifest.nix;
@@ -60,7 +58,7 @@
         };
 
         tasks = {
-          gemini = pkgs.callPackage ./nix/tasks/gemini.nix { inherit pkgs; gemini-cli = pkgs.gemini-cli; };
+          gemini = pkgs.callPackage ./nix/tasks/gemini.nix { inherit pkgs gemini-cli; };
           run-gemini-cli = pkgs.callPackage ./nix/tasks/run-gemini-cli.nix { inherit pkgs; };
           solana-ai-trigger = pkgs.callPackage ./nix/tasks/solana-ai-trigger.nix { inherit pkgs; };
           process-solana-nar = pkgs.callPackage ./nix/tasks/process-solana-nar.nix { inherit pkgs; };

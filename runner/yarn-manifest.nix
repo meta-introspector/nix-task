@@ -72,7 +72,7 @@ let
       outputName = "esbuild-android-arm-0.15.12-199f527c33";
       outputHash = "";
       shouldBeUnplugged = true;
-      installCondition = stdenv: (false) && (stdenv.isAarch32);
+      installCondition = stdenv: false && stdenv.isAarch32;
       flatName = "android-arm";
       languageName = "node";
       scope = "esbuild";
@@ -85,7 +85,7 @@ let
       outputName = "esbuild-linux-loong64-0.15.12-738ac6232d";
       outputHash = "";
       shouldBeUnplugged = true;
-      installCondition = stdenv: (stdenv.isLinux) && (false);
+      installCondition = stdenv: stdenv.isLinux && false;
       flatName = "linux-loong64";
       languageName = "node";
       scope = "esbuild";
@@ -448,7 +448,7 @@ let
       outputName = "esbuild-android-64-0.15.12-e02bdf9f5f";
       outputHash = "";
       shouldBeUnplugged = true;
-      installCondition = stdenv: (false) && (stdenv.isx86_64);
+      installCondition = stdenv: false && stdenv.isx86_64;
       flatName = "esbuild-android-64";
       languageName = "node";
       scope = null;
@@ -461,7 +461,7 @@ let
       outputName = "esbuild-android-arm64-0.15.12-7af64ee406";
       outputHash = "";
       shouldBeUnplugged = true;
-      installCondition = stdenv: (false) && (stdenv.isAarch64);
+      installCondition = stdenv: false && stdenv.isAarch64;
       flatName = "esbuild-android-arm64";
       languageName = "node";
       scope = null;
@@ -474,7 +474,7 @@ let
       outputName = "esbuild-darwin-64-0.15.12-dcb3968937";
       outputHash = "";
       shouldBeUnplugged = true;
-      installCondition = stdenv: (stdenv.isDarwin) && (stdenv.isx86_64);
+      installCondition = stdenv: stdenv.isDarwin && stdenv.isx86_64;
       flatName = "esbuild-darwin-64";
       languageName = "node";
       scope = null;
@@ -489,7 +489,7 @@ let
         "aarch64-darwin" = "sha512-A1j+larPhd3E4X+a92mqLZZrFt8DXALaYzIvwx3ri/RAli0/MJ79w3L/ibYQilkbGPCsHNu03jNVW3f3r7YB9w==";
       };
       shouldBeUnplugged = true;
-      installCondition = stdenv: (stdenv.isDarwin) && (stdenv.isAarch64);
+      installCondition = stdenv: stdenv.isDarwin && stdenv.isAarch64;
       flatName = "esbuild-darwin-arm64";
       languageName = "node";
       scope = null;
@@ -502,7 +502,7 @@ let
       outputName = "esbuild-freebsd-64-0.15.12-f35d6b91ef";
       outputHash = "";
       shouldBeUnplugged = true;
-      installCondition = stdenv: (false) && (stdenv.isx86_64);
+      installCondition = stdenv: false && stdenv.isx86_64;
       flatName = "esbuild-freebsd-64";
       languageName = "node";
       scope = null;
@@ -515,7 +515,7 @@ let
       outputName = "esbuild-freebsd-arm64-0.15.12-0a01572c70";
       outputHash = "";
       shouldBeUnplugged = true;
-      installCondition = stdenv: (false) && (stdenv.isAarch64);
+      installCondition = stdenv: false && stdenv.isAarch64;
       flatName = "esbuild-freebsd-arm64";
       languageName = "node";
       scope = null;
@@ -528,7 +528,7 @@ let
       outputName = "esbuild-linux-32-0.15.12-73e2c15251";
       outputHash = "";
       shouldBeUnplugged = true;
-      installCondition = stdenv: (stdenv.isLinux) && (stdenv.isi686);
+      installCondition = stdenv: stdenv.isLinux && stdenv.isi686;
       flatName = "esbuild-linux-32";
       languageName = "node";
       scope = null;
@@ -543,7 +543,7 @@ let
         "x86_64-linux" = "sha512-kIMptZse6jmOwsJSvDcFMdx7YzcIxbs+fSugMr6uzwtzdUJ2CM8o4Ml/aPX9nHEkWLeYAJx3ZShODG1Wqeo8CA==";
       };
       shouldBeUnplugged = true;
-      installCondition = stdenv: (stdenv.isLinux) && (stdenv.isx86_64);
+      installCondition = stdenv: stdenv.isLinux && stdenv.isx86_64;
       flatName = "esbuild-linux-64";
       languageName = "node";
       scope = null;
@@ -556,7 +556,7 @@ let
       outputName = "esbuild-linux-arm-0.15.12-ef545c652b";
       outputHash = "";
       shouldBeUnplugged = true;
-      installCondition = stdenv: (stdenv.isLinux) && (stdenv.isAarch32);
+      installCondition = stdenv: stdenv.isLinux && stdenv.isAarch32;
       flatName = "esbuild-linux-arm";
       languageName = "node";
       scope = null;
@@ -571,7 +571,7 @@ let
         "aarch64-linux" = "sha512-cHIl9IcJpPcakQ1xCwOfgPquqd7U84p2oZUlrx9EvAduZZVj1voA73gjcfe2Rs+y1l6p3S+dnleqxLZosMYJmQ==";
       };
       shouldBeUnplugged = true;
-      installCondition = stdenv: (stdenv.isLinux) && (stdenv.isAarch64);
+      installCondition = stdenv: stdenv.isLinux && stdenv.isAarch64;
       flatName = "esbuild-linux-arm64";
       languageName = "node";
       scope = null;
@@ -584,8 +584,7 @@ let
       outputName = "esbuild-linux-mips64le-0.15.12-2473d5a61b";
       outputHash = "";
       shouldBeUnplugged = true;
-      installCondition = stdenv: (stdenv.isLinux) && (false);
-      flatName = "esbuild-linux-mips64le";
+      installCondition = stdenv: stdenv.isLinux && false;
       languageName = "node";
       scope = null;
       descriptorRange = "npm:0.15.12";
@@ -597,7 +596,7 @@ let
       outputName = "esbuild-linux-ppc64le-0.15.12-ca7de822fc";
       outputHash = "";
       shouldBeUnplugged = true;
-      installCondition = stdenv: (stdenv.isLinux) && (false);
+      installCondition = stdenv: stdenv.isLinux && false;
       flatName = "esbuild-linux-ppc64le";
       languageName = "node";
       scope = null;
@@ -610,7 +609,7 @@ let
       outputName = "esbuild-linux-riscv64-0.15.12-4fc70b6573";
       outputHash = "";
       shouldBeUnplugged = true;
-      installCondition = stdenv: (stdenv.isLinux) && (false);
+      installCondition = stdenv: stdenv.isLinux && false;
       flatName = "esbuild-linux-riscv64";
       languageName = "node";
       scope = null;
@@ -623,7 +622,7 @@ let
       outputName = "esbuild-linux-s390x-0.15.12-f4c4c495f6";
       outputHash = "";
       shouldBeUnplugged = true;
-      installCondition = stdenv: (stdenv.isLinux) && (false);
+      installCondition = stdenv: stdenv.isLinux && false;
       flatName = "esbuild-linux-s390x";
       languageName = "node";
       scope = null;
@@ -633,10 +632,7 @@ let
       name = "esbuild-netbsd-64";
       reference = "npm:0.15.12";
       linkType = "HARD";
-      outputName = "esbuild-netbsd-64-0.15.12-de1349abcc";
-      outputHash = "";
-      shouldBeUnplugged = true;
-      installCondition = stdenv: (false) && (stdenv.isx86_64);
+      installCondition = stdenv: false && stdenv.isx86_64;
       flatName = "esbuild-netbsd-64";
       languageName = "node";
       scope = null;
@@ -646,10 +642,7 @@ let
       name = "esbuild-openbsd-64";
       reference = "npm:0.15.12";
       linkType = "HARD";
-      outputName = "esbuild-openbsd-64-0.15.12-6046081d55";
-      outputHash = "";
-      shouldBeUnplugged = true;
-      installCondition = stdenv: (false) && (stdenv.isx86_64);
+      installCondition = stdenv: false && stdenv.isx86_64;
       flatName = "esbuild-openbsd-64";
       languageName = "node";
       scope = null;
