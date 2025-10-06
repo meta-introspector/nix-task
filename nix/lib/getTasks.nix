@@ -6,7 +6,7 @@ with builtins;
 let
   flatten = x:
     if isList x
-    then concatMap (y: flatten y) x
+    then concatMap flatten x
     else [x];
   mapAttrsToList = f: attrs:
     map (name: f name attrs.${name}) (attrNames attrs);
@@ -51,14 +51,14 @@ let
       collectTask { inherit taskDefinition; inherit currentPath; inherit opts; }
     else if (isAttrSetWithTaskOutput taskDefinition) then
       collectTasks { output = taskDefinition.output.deps; currentPath = "${currentPath}.output.deps"; inherit opts; }
-    else if (isAttrs taskDefinition) && (hasAttr "_nixTaskDontRecurseTasks" taskDefinition) && (taskDefinition._nixTaskDontRecurseTasks) then []
+    else if (isAttrs taskDefinition) && (hasAttr "_nixTaskDontRecurseTasks" taskDefinition) && taskDefinition._nixTaskDontRecurseTasks then []
     else
       collectTasks { output = taskDefinition; inherit currentPath; inherit opts; }
     ;
 
   collectTask = { taskDefinition, currentPath, opts }:
     let
-      task = with taskDefinition; (if (hasAttr "includeExtraAttributes" opts) && opts.includeExtraAttributes == true then taskDefinition else {}) // {
+      task = with taskDefinition; (if (hasAttr "includeExtraAttributes" opts) && opts.includeExtraAttributes then taskDefinition else {}) // {
         inherit id;
         inherit __type;
         getLazy = null;
@@ -108,7 +108,7 @@ let
 
   formatTasks = collectedTasks:
     let
-      orderedTasks = sort sortTasks (collectedTasks);
+      orderedTasks = sort sortTasks collectedTasks;
       taskDefinitions = uniquePredicate (a: b: a.id != b.id) orderedTasks;
     in
       taskDefinitions;

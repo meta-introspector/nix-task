@@ -3,8 +3,6 @@
 with builtins;
 with lib;
 
-let
-in
 opts@{
   deps ? {},
   getOutput ? null,

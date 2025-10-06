@@ -679,7 +679,7 @@ let
       outputName = "esbuild-sunos-64-0.15.12-4dcea658e1";
       outputHash = "";
       shouldBeUnplugged = true;
-      installCondition = stdenv: (false) && (stdenv.isx86_64);
+      installCondition = stdenv: false && stdenv.isx86_64;
       flatName = "esbuild-sunos-64";
       languageName = "node";
       scope = null;
@@ -692,7 +692,7 @@ let
       outputName = "esbuild-windows-32-0.15.12-d27f8dbee5";
       outputHash = "";
       shouldBeUnplugged = true;
-      installCondition = stdenv: (false) && (stdenv.isi686);
+      installCondition = stdenv: false && stdenv.isi686;
       flatName = "esbuild-windows-32";
       languageName = "node";
       scope = null;
@@ -705,7 +705,7 @@ let
       outputName = "esbuild-windows-64-0.15.12-117b1a955a";
       outputHash = "";
       shouldBeUnplugged = true;
-      installCondition = stdenv: (false) && (stdenv.isx86_64);
+      installCondition = stdenv: false && stdenv.isx86_64;
       flatName = "esbuild-windows-64";
       languageName = "node";
       scope = null;
@@ -718,7 +718,7 @@ let
       outputName = "esbuild-windows-arm64-0.15.12-4270ce8f2d";
       outputHash = "";
       shouldBeUnplugged = true;
-      installCondition = stdenv: (false) && (stdenv.isAarch64);
+      installCondition = stdenv: false && stdenv.isAarch64;
       flatName = "esbuild-windows-arm64";
       languageName = "node";
       scope = null;

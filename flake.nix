@@ -21,7 +21,7 @@
           overlays = [
             (final: prev: {
               nodejs = prev.nodejs_20;
-              yarn = (prev.yarn.override { nodejs = prev.nodejs_20; });
+              yarn = prev.yarn.override { nodejs = prev.nodejs_20; };
             })
           ];
         };

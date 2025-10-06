@@ -3,8 +3,6 @@
 with builtins;
 with lib;
 
-let
-in
 opts@{
   stableId ? null,
   dir ? null,
