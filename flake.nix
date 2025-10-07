@@ -5,7 +5,7 @@
     nixpkgs.url = "github:meta-introspector/nixpkgs?ref=feature/CRQ-016-nixify";
     utils.url = "github:meta-introspector/flake-utils";
     yarnpnp2nix = { url = "github:meta-introspector/yarnpnp2nix"; inputs.nixpkgs.follows = "nixpkgs"; inputs.utils.follows = "utils"; };
-    gemini-cli.url = "github:meta-introspector/gemini-cli?ref=feature/working-gemini-cli-nix-store";
+    gemini-cli.url = "github:meta-introspector/gemini-cli?ref=feature/CRQ-016-nixify-2025-10-06";
 
     base-job.url = "github:meta-introspector/time-2025/feature/foaf?dir=09/26/jobs/vendor/nix-task/nix/base-job";
   };
