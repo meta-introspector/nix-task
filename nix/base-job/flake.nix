@@ -2,7 +2,7 @@
   description = "Base flake for common job definitions and utilities";
 
   inputs = {
-  inputs.nixpkgs.url = "github:meta-introspector/nixpkgs?ref=feature/CRQ-016-nixify";
+    nixpkgs.url = "github:meta-introspector/nixpkgs?ref=feature/CRQ-016-nixify";
     utils.url = "github:meta-introspector/flake-utils?ref=feature/CRQ-016-nixify";
   };
 
