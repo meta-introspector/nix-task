@@ -1,10 +1,10 @@
+{ pkgs, lib, mkTask, gemini-cli }:
 
-{ lib, pkgs, gemini-cli }:
-
-pkgs.callPackage ../lib/mkTask.nix {
+mkTask {
   stableId = "run-gemini-cli-interactive";
+  impureBuild = true;
   run = ''
-    ${pkgs.nix}/bin/nix run ${gemini-cli}#gemini -- --prompt ""
+    ${pkgs.nix}/bin/nix run ${gemini-cli}#gemini -- --prompt "Test prompt"
   '';
   path = [ pkgs.nix ];
   impureEnvPassthrough = [ "HOME" "TERM" ]; # Pass through necessary environment variables

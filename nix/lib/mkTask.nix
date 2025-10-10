@@ -1,4 +1,4 @@
-{ pkgs, lib, path ? [], run ? "", impureEnvPassthrough ? [], stableId ? null }:
+{ pkgs, lib, path ? [], run ? "", impureEnvPassthrough ? [], stableId ? null, impureBuild ? false }:
 
 with builtins;
 with lib;
@@ -26,6 +26,7 @@ else
 {
   inherit id;
   __type = "task";
+  inherit (lib.optionalAttrs impureBuild { __impure = true; }) __impure;
   inherit path;
   inherit deps;
   inherit artifacts;
