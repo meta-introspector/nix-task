@@ -7,7 +7,7 @@
     yarnpnp2nix = { url = "github:meta-introspector/yarnpnp2nix"; inputs.nixpkgs.follows = "nixpkgs"; inputs.utils.follows = "utils"; };
     gemini-cli.url = "github:meta-introspector/gemini-cli?ref=feature/CRQ-016-nixify-2025-10-06";
 
-    base-job.url = "github:meta-introspector/time-2025/feature/foaf?dir=09/26/jobs/vendor/nix-task/nix/base-job";
+    base-job.url = "github:meta-introspector/nix-task?dir=nix/base-job&ref=feature/lattice-30030-homedir";
   };
 
   outputs = inputs@{ self, nixpkgs, utils, base-job, gemini-cli, ... }:
